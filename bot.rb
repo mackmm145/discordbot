@@ -71,16 +71,20 @@ end
 ########/card
 
 bot.message(:starting_with => "/card") do |event|
-  name = event.message.text.gsub("/card", "")
-  if name.is_a? String
-    cards = Mech.new.get_card(name)
-    if cards.empty?
-      event.respond "no match found"
+  if event.message.channel.name == "hearthstone_chat"
+    name = event.message.text.gsub("/card", "")
+    if name.is_a? String
+      cards = Mech.new.get_card(name)
+      if cards.empty?
+        event.respond "no match found"
+      else
+        cards.each { |card| event.respond(card) }
+      end
     else
-      cards.each { |card| event.respond(card) }
+      not_a_string(event)
     end
   else
-    not_a_string(event)
+    event.respond "sorry... my master has restricted my usage to only the hearthstone_chat channel"
   end
 end
 
