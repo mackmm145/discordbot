@@ -1,7 +1,8 @@
 # This simple bot responds to every "Ping!" message with a "Pong!"
 require 'json'
 require 'discordrb'
-require_relative 'mech_insult'
+require_relative 'mech'
+require_relative 'helpers'
 
 members = Hash.new("unkown user - please check the spelling or the member is not currently in the database")
 members["gabemachida"]        = "GabeMachida - League[ GabeMachida** ] - Gabe"
@@ -29,7 +30,7 @@ bot = Discordrb::Bot.new "mack@arigatos.net", ENV["HIDDEN_PASSWORD"]
 
 ######## /whois
 bot.message(:starting_with => '/whois') do |event|
-  puts event.message.text
+  puts event.message.textGh
   name = event.message.text.split(" ")[1]
   if name.is_a? String
     name = name.downcase
@@ -63,9 +64,24 @@ bot.message(:starting_with => "/insult") do |event|
     name = name.downcase
     event.respond "hey " + name + "! " + Mech.new.get_new_insult.downcase.gsub(".","!")
   else
-    event.respond event.user.name + "... learn to use this bot, you lazy bum."
+    not_a_string(event)
   end
 end
 
+########/card
+
+bot.message(:starting_with => "/card") do |event|
+  name = event.message.text.gsub("/card", "")
+  if name.is_a? String
+    cards = Mech.new.get_card(name)
+    if cards.empty?
+      event.respond "no match found"
+    else
+      cards.each { |card| event.respond(card) }
+    end
+  else
+    not_a_string(event)
+  end
+end
 
 bot.run
