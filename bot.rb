@@ -2,35 +2,14 @@
 require 'json'
 require 'discordrb'
 require_relative 'mech'
+require_relative 'whois'
 require_relative 'helpers'
-
-members = Hash.new("unkown user - please check the spelling or the member is not currently in the database")
-members["gabemachida"]        = "GabeMachida - League[ GabeMachida** ] - Gabe"
-members["professorpancake"]   = "ProfessorPancake - League[ SergeantScone ] - Ray"
-members["david"]              = "David - League[ BrianFranklin ] - David"
-members["kanzu"]              = "Kanzu - League[ Kanzu ] - Kanzu / Char"
-members["pcband04"]           = "pcband04 - League[ Fuego5 / Sevenpieces7 ] - Dan"
-members["icebluefire"]        = "IceBlueFire - League [ IceBlueFire ] - Adam"
-members["pn109a"]             = "pn109a - League [ Pn109a ] - James"
-members["raidboss"]           = "Raidboss - League [ Shadestealth ] - Ralphy"
-members["senpai"]             = "Senpai - League [ Banant ] - Tat"
-members["stjonnie"]           = "StJonnie - League [ StJonnie ] - Jonnie"
-members["burgermeizter"]      = "Burgermeizter - League [ Burgermeizter ] - Brandon"
-members["drakghoul"]          = "Drakghoul - League [ Drakghoul ] - Sam"
-members["gatorade"]           = "Gatorade - League [ HeroAnti ] - Wesley"
-members["goss"]               = "Goss - League [ Goss6 ] - Goss / John"
-members["jnigs"]              = "Jnigs - League [ Senpiee ] - Justin"
-members["knobbob"]            = "KnobBob - League [ LDxBroseph ] - Joe"
-members["mezmerized"]         = "Mezmerized - League [ MezmerizedSC ] - Zach"
-members["shamas888"]          = "Shamas888 - League [ ] - Seamus"
-members["spacenoodle"]        = "Spacenoodle - honorary member - Julian"
-members["gabes_henchman"]     = "Gabe's Henchman - that's me bitches"
 
 bot = Discordrb::Bot.new "mack@arigatos.net", ENV["HIDDEN_PASSWORD"]
 
 ######## /whois
 bot.message(:starting_with => '/whois') do |event|
-  puts event.message.textGh
+  puts event.message.text
   name = event.message.text.split(" ")[1]
   if name.is_a? String
     name = name.downcase
@@ -68,6 +47,25 @@ bot.message(:starting_with => "/insult") do |event|
   end
 end
 
+################ /trivia
+bot.message(:with_text => "/trivia") do |event|
+  event.respond Mech.new.get_new_trivia
+end
+
+##############/motivate
+
+bot.message(:starting_with => "/motivate") do |event|
+  puts event.message.text
+  name = event.message.text.split(" ")[1]
+
+  if name.is_a? String
+    name = name.downcase
+    event.respond "listen, " + name + ". " + Mech.new.get_new_motivation.downcase
+  else
+    not_a_string(event)
+  end
+end
+
 ########/card
 
 bot.message(:starting_with => "/card") do |event|
@@ -75,6 +73,24 @@ bot.message(:starting_with => "/card") do |event|
     name = event.message.text.gsub("/card", "")
     if name.is_a? String
       cards = Mech.new.get_card(name)
+      if cards.empty?
+        event.respond "no match found"
+      else
+        cards.each { |card| event.respond(card) }
+      end
+    else
+      not_a_string(event)
+    end
+  else
+    event.respond "sorry... my master has restricted my usage to only the hearthstone_chat channel"
+  end
+end
+
+bot.message(:starting_with => "/name") do |event|
+  if event.message.channel.name == "hearthstone_chat"
+    name = event.message.text.gsub("/name", "")
+    if name.is_a? String
+      cards = Mech.new.get_card_name(name)
       if cards.empty?
         event.respond "no match found"
       else
