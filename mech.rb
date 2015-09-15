@@ -8,8 +8,8 @@ class Mech
   def get_roles(text)
     regex = /\[(.*?)\]/
     s = Array.new
-    s << text.scan(regex)[0]
-    s << text.scan(regex)[1]
+    s << text.scan(regex)[0][0]
+    s << text.scan(regex)[1][0]
 
     if s[0].nil? or s[1].nil? #make sure the formatting was correct
       return "please use the format /roles [top jun mid adc sup][brandon jonnie char ray ralpy] the first [] and second [] require the same number of fields."
@@ -23,7 +23,14 @@ class Mech
         field.collect! { |g| g.chomp }
       end
 
-      puts f
+      if f[0].count == f[1].count
+        f[1] = f[1].shuffle
+        return f[0].each_with_index.map {|g, i| g + ": " + f[1][i]}
+      else
+        return "the first [] and second [] require the same number of fields."
+      end
+
+      puts f.inspect
     end
 
   end
