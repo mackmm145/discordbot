@@ -1,11 +1,12 @@
 # This simple bot responds to every "Ping!" message with a "Pong!"
 require 'json'
+require 'active_support/core_ext/module'
 require 'discordrb'
 require_relative 'mech'
 require_relative 'whois'
 require_relative 'helpers'
 
-bot = Discordrb::Bot.new "mack@arigatos.net", ENV["HIDDEN_PASSWORD"]
+bot = Discordrb::Bot.new "mack@arigatos.net", ENV["HIDDEN_PASSWORD"], true
 
 ######## /whois
 bot.message(:starting_with => '/whois') do |event|
@@ -33,18 +34,82 @@ bot.message(:with_text => "/schedule") do |event|
   event.respond "http://na.lolesports.com/schedule"
 end
 
+#########/ champ
+bot.message(:starting_with => "/champ") do |event|
+  parse_string = event.message.text[7..-1].downcase
+  parse = parse_string.split(/[\s,]+/)
+  champ_name = ""
+  show_link = false
+  skills = []
+  getting_name = true
+  parse.each do |p|
+    champ_name = champ_name + " " + p if p.length > 1 && getting_name
+    
+    if p.length == 1
+      getting_name = false
+      skills << :innate if p == "p"
+      skills << :q if p == "q"
+      skills << :w if p == "w"
+      skills << :e if p == "e"
+      skills << :r if p == "r"
+    end
+
+    if parse_string.include?("passive")
+      skills << :innate
+    end
+
+    skills.uniq!
+  end
+
+  if skills.empty?
+    skills = [ :innate, :q, :w, :e, :r ]
+    show_link = true
+  end
+
+  champ_name = champ_name.strip
+  abilities = Mech.new.get_champ(champ_name, skills)
+
+  event.respond champ_name.capitalize
+  if abilities.any?
+    skills.each do |skill|
+      skill_string = skill.to_s.upcase if skill.length == 1
+      skill_string = "Passive" if skill == :innate
+      event.respond skill_string + " - " + abilities[skill][:title]
+      event.respond abilities[skill][:info1]
+      event.respond abilities[skill][:info2] if abilities[skill][:info2].length > 0 
+      event.respond abilities[skill][:range]
+      event.respond abilities[skill][:cost]
+      event.respond abilities[skill][:cooldown]
+      event.respond " "
+    end
+    event.respond abilities[:link]
+  else
+    event.respond "Champion by that name not found. Check your spelling, man."
+    event.respond "btw... evelynn not evelyn" if champ_name.downcase == "evelyn"
+  end
+
+end
+
+
 ########/insult
 
 bot.message(:starting_with => "/insult") do |event|
   puts event.message.text
   name = event.message.text.split(" ")[1]
 
-  if name.is_a? String
-    name = name.downcase
-    event.respond "hey " + name + "! " + Mech.new.get_new_insult.downcase.gsub(".","!")
+  if event.message.user.name.downcase == "raidboss"
+    event.respond "hey ralphy! " + Mech.new.get_new_insult.downcase.gsub(".","!")
+    event.respond "and btw... don't chase."
   else
-    not_a_string(event)
+    if name.is_a? String
+      name = name.downcase
+      event.respond "hey " + name + "! " + Mech.new.get_new_insult.downcase.gsub(".","!")
+    else
+      not_a_string(event)
+    end
   end
+
+
 end
 
 ################ /trivia

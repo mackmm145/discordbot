@@ -49,4 +49,53 @@ class Mech
     return card_src    
   end
 
+  def get_champ(name, skills)
+    champ_name = name.split(/(\W)/).map(&:capitalize).join
+    link =  "http://leagueoflegends.wikia.com/wiki/" + champ_name.gsub(" ", "_")
+    puts link
+    @agent.get( "http://leagueoflegends.wikia.com/wiki/" + champ_name.gsub(" ", "_") )
+    return {} if @agent.page.parser.css("div.skill_innate table")[0].nil?
+
+    abilities = Hash.new
+
+    skills.each do | skill |
+      div_skill = "div.skill_" + skill.to_s
+      title = @agent.page.parser.css(div_skill + " table")[0].css("td").first
+      title = title.nil? ? "" : title.text.strip
+
+      info = @agent.page.parser.css(div_skill + " table")[1]
+      info = info.nil? ? "" : info.text.strip.gsub("\r\r\r", "\r\r").gsub("\n\n\n", "\n\n").gsub("\r\r", "\r").gsub("\n\n", "\n")
+      if info.length > 2000
+        info1 = info[0..1999]
+        info2 = info[2000..-1]
+      else
+        info1 = info
+        info2 = ""
+      end
+
+
+      range = @agent.page.parser.css(div_skill + " div#rangecontainer").first
+      range = range.nil? ? "" : range.text.strip
+
+
+      cost = @agent.page.parser.css(div_skill + " div#costcontainer").first
+      cost = cost.nil? ? "" : cost.text.strip
+
+      cooldown = @agent.page.parser.css(div_skill + " div#cooldowncontainer").first
+      cooldown = cooldown.nil? ? "" : cooldown.text.strip    
+
+      abilities[ skill ] = { :title => title.gsub("\u00A0", ""), 
+                             :info1 => info1.gsub("\u00A0", ""),
+                             :info2 => info2.gsub("\u00A0", ""),
+                             :range => range.gsub("\u00A0", ""),
+                             :cost => cost.gsub("\u00A0", ""),
+                             :cooldown => cooldown.gsub("\u00A0", "") }
+    end
+    abilities[:champ_name] = champ_name
+    abilities[:link] = link
+    return abilities
+  rescue
+    return {}
+  end
+
 end
