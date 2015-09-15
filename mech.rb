@@ -5,6 +5,29 @@ class Mech
     @agent = Mechanize.new
   end
 
+  def get_roles(text)
+    regex = /\[(.*?)\]/
+    s = Array.new
+    s << text.scan(regex)[0]
+    s << text.scan(regex)[1]
+
+    if s[0].nil? or s[1].nil? #make sure the formatting was correct
+      return "please use the format /roles [top jun mid adc sup][brandon jonnie char ray ralpy] the first [] and second [] require the same number of fields."
+    else
+      #makes sure that theres some values
+      f = Array.new
+      f[0] = s[0].split
+      f[1] = s[1].split
+
+      f.each do |field|
+        field.collect! { |g| g.chomp }
+      end
+
+      puts f
+    end
+
+  end
+
   def get_new_insult
     @agent.get("http://www.insultgenerator.org/")
     comment = @agent.page.parser.css("div.wrap").first

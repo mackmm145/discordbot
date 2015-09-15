@@ -6,7 +6,6 @@ require_relative 'mech'
 require_relative 'whois'
 require_relative 'helpers'
 
-puts eightball[1]
 
 bot = Discordrb::Bot.new "mack@arigatos.net", ENV["HIDDEN_PASSWORD"], true
 
@@ -16,10 +15,10 @@ bot.message(:starting_with => '/whois') do |event|
   name = event.message.text.split(" ")[1]
   if name.is_a? String
     name = name.downcase
-    event.respond members[name]
+    event.respond @members[name]
   else
     if event.message.text == '/whoisall'
-      members.each do |key, member|
+      @members.each do |key, member|
         puts member
         event.respond member unless key == "gabes_henchman"
       end
@@ -171,9 +170,13 @@ end
 
 ################ /8ball
 bot.message(:starting_with => "/8ball") do |event|
-  event.respond eightball[ rand(20) ]
+  event.respond @eightball[ rand(20) ]
 end
 
+############# /roles
+bot.message(:starting_with => "/role") do |event|
+  puts Mech.new.get_roles(event.message.text)
+end
 
 
 bot.run
