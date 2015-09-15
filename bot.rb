@@ -6,7 +6,7 @@ require_relative 'mech'
 require_relative 'whois'
 require_relative 'helpers'
 
-puts hi[1]
+puts eightball[1]
 
 bot = Discordrb::Bot.new "mack@arigatos.net", ENV["HIDDEN_PASSWORD"], true
 

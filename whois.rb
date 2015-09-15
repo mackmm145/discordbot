@@ -1,5 +1,5 @@
 
-hi = [        "It is certain",
+eightball = [        "It is certain",
               "It is decidedly so",
               "Without a doubt",
               "Yes, definitely",
