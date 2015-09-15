@@ -6,6 +6,8 @@ require_relative 'mech'
 require_relative 'whois'
 require_relative 'helpers'
 
+puts hi[1]
+
 bot = Discordrb::Bot.new "mack@arigatos.net", ENV["HIDDEN_PASSWORD"], true
 
 ######## /whois
@@ -108,8 +110,6 @@ bot.message(:starting_with => "/insult") do |event|
       not_a_string(event)
     end
   end
-
-
 end
 
 ################ /trivia
@@ -168,5 +168,12 @@ bot.message(:starting_with => "/name") do |event|
     event.respond "sorry... my master has restricted my usage to only the hearthstone_chat channel"
   end
 end
+
+################ /8ball
+bot.message(:starting_with => "/8ball") do |event|
+  event.respond eightball[ rand(20) ]
+end
+
+
 
 bot.run
