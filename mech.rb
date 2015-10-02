@@ -25,7 +25,7 @@ class Mech
 
       if f[0].count == f[1].count
         f[1] = f[1].shuffle
-        return f[0].each_with_index.map {|g, i| g + ": " + f[1][i]}
+        return (f[0].each_with_index.map {|g, i| g + ": " + f[1][i]}).join("\n")
       else
         return "the first [] and second [] require the same number of fields."
       end
@@ -128,4 +128,40 @@ class Mech
     return {}
   end
 
+  def get_trivia()
+    year = 2010 + rand(5)
+    month = rand(12) + 1
+    page = rand(6) + 1
+
+    month_string = month.to_s.length == 1 ? "0" + month.to_s : month.to_s
+
+    link = "http://triviaoftheday.wordpress.com/" + year.to_s + "/" + month_string + "/page/" + page.to_s + "/"
+
+    trivia_page = Mechanize.new{|a| a.ssl_version, a.verify_mode = 'TLSv1', OpenSSL::SSL::VERIFY_NONE}.get(link)
+    trivia = trivia_page.parser.css("div.entry-content > p")
+    trivia_array = Array.new
+    trivia.each {|t| trivia_array << t.text.gsub(/\t/, "").squeeze(" ").gsub(/\n/, "").gsub('\t', "") }
+
+    trivia_array.shuffle[0]
+  rescue
+    retry
+  end
+
+  def get_selfpost(subreddit, misc)
+
+    url = "http://www.reddit.com/r/#{ subreddit }/comments/#{ misc }.json"
+    response = Net::HTTP.get(URI.parse(url))
+    results = JSON.parse(response, :max_nesting => 100)
+    if results[0]["data"]["children"][0]["data"]["is_self"]
+      text = results[0]["data"]["children"][0]["data"]["selftext"]
+      text_count = text.length
+      text = text[0..999] || text
+      text = text + " ... **there's more at the original link**" if text_count > 1000
+      text
+    else
+      ""
+    end
+    rescue
+     ""
+  end
 end

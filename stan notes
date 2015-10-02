@@ -1,0 +1,96 @@
+Just so you guys know probably within a week there will be a major real-time system change to Discord.
+the /gateway call will need the auth token because gateways will be assigned around a consistent hash ring
+If you conncet to the wrong gateway it will send you a redirect opcode with the URL to the correct one
+But the easiest way to be ready for this is to just send the auth token to /api/gateway and then you dont need to worry about it
+Voltana09/06/2015
+kk
+Stanislav09/06/2015
+But the redirect opcode can be also fired if the servers rebalance
+but doubt that will be happening for a bit after the upgrade
+Voltana09/06/2015
+I believe most websocket implementations should handle redirects auto
+(hopefully)
+Stanislav09/06/2015
+its not a websocket redirect
+its an event on the websocket
+Voltana09/06/2015
+ohhh
+okay, that's a bit more work
+Stanislav09/06/2015
+its special cause gateways support resuming a session id
+instead of identify you send a resume
+with the previous session id
+and it keeps going on the new node
+Voltana09/06/2015
+gotcha
+Stanislav09/06/2015
+This way we can seamless move people between gateways during DDoS or just scale up 😃
+also works for timeouts (aka cloudflare issue)
+Voltana09/06/2015
+does this affect only data websockets, or voice as well?
+Stanislav09/06/2015
+only the gateway one
+voice wont change
+Voltana09/06/2015
+kk
+thanks for the headsup 😄
+Danny09/06/2015
+luckily I migrated my /api/gateway call to use auth lol
+izy52109/06/2015
+@Stanislav Do you have an example of one of those redirect events?
+Stanislav09/06/2015
+opcode is 7
+and the data is just
+{"url": "new websocket url here"}
+izy52109/06/2015
+Ok, thanks
+Stanislav09/06/2015
+If you want to support resuming a session you need to keep the session_id in your websocket instance.. and also keep track of the 's'  variable aka seq on events (keep last one)
+and when you try reconnect after a DC or a redirect
+send opcode 6 with {'session_id': session_id, 'seq': seq}
+instead of identify
+Voltana09/06/2015
+I hate race conditions >.>
+gonna redesign slightly so redirects work xD
+hydrabolt09/06/2015
+@Stanislav what's this change? I can't scroll up enough 😦
+Voltana09/06/2015
+/gateway requires auth
+hydrabolt09/06/2015
+Oh I know that 😛
+Voltana09/06/2015
+can also get opcode 7 on non-voice websocket to redirect
+includes a url parameter
+hydrabolt09/06/2015
+Oh
+Voltana09/06/2015
+after connecting to the  other url, "send opcode 6 with {'session_id': session_id, 'seq': seq}"
+hydrabolt09/06/2015
+Wouldn't there be some dropped packets in that case??
+What's seq
+Voltana09/06/2015
+"and also keep track of the 's'  variable aka seq on events (keep last one)"
+you cant scroll up like 10 lines? o.O
+lol
+Stanislav09/06/2015
+if seq matches it means you lost nothing and server will accept the resume
+server also buffers all packets while your reconnecting to new server
+hydrabolt09/06/2015
+Ah ok
+But what is seq
+Stanislav09/06/2015
+every message will have a seq
+'s'
+keep the last one
+hydrabolt09/06/2015
+Ohh
+Stanislav09/06/2015
+alawys
+always
+hydrabolt09/06/2015
+Okay gotcha!
+Thanks
+Voltana09/06/2015
+int, I assume?
+Stanislav09/06/2015
+ya

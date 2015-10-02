@@ -113,7 +113,12 @@ end
 
 ################ /trivia
 bot.message(:with_text => "/trivia") do |event|
-  event.respond Mech.new.get_new_trivia
+  lazy = rand(5)
+  if lazy == 0
+    event.respond Mech.new.get_new_trivia
+  else
+    event.respond Mech.new.get_trivia
+  end
 end
 
 ##############/motivate
@@ -175,7 +180,67 @@ end
 
 ############# /roles
 bot.message(:starting_with => "/role") do |event|
-  puts Mech.new.get_roles(event.message.text)
+  event.respond Mech.new.get_roles(event.message.text)
+end
+
+############# /dice
+bot.message(:starting_with => ["/dice", "/roll"] ) do |event|
+  if event.message.text.strip.length == 5
+    event.respond (rand(6) + 1).to_s
+  else
+    text = event.message.text[5..-1].strip
+    puts text
+
+    if text.include?("[") && text.include?("]")
+      regex = /\[(.*?)\]/
+      options = text.scan(regex)[0][0].split
+      event.respond options[ rand(options.length) ]
+    else
+      if !/\A\d+\z/.match(text)
+        #if two values
+        if text.split.length >= 2
+          val1 = text.split[0].to_i
+          val2 = text.split[1].to_i
+
+          if val1 > val2
+            temp = val1; val1 = val2; val2 = temp
+          end
+
+          diff = val2 - val1
+          event.respond ( val1 + rand(diff) + rand(2) ).to_s
+
+        else
+          event.respond "format not recognized for /roll /dice."
+          event.respond " /roll or /dice are interchangeable"
+          event.respond " /dice with no arguments will roll a 6 sided die"
+          event.respond " /dice with a positive integer value will roll a value from 1 to that value"
+          event.respond " /dice with two postiive integer values will roll a value between those values"
+          event.respond " /dice [value1 value2 value3 ...] will roll a random named value" 
+        end 
+      else
+        #Is all good ..continue
+        event.respond (rand(text.to_i) + 1).to_s
+      end  
+    end
+  end
+end
+
+
+########### reddit self
+
+bot.message(:containing => "https://www.reddit.com/r/"  ) do |event|
+  text = event.message.text
+  text = text[0..-6] if text[-5..-1].downcase == ".json"
+  text = text[0...-1] if text[-1] == "/"
+
+  regex = /https:\/\/www.reddit.com\/r\/(.*?)\/comments\/(.*)/
+
+  subreddit = text.scan(regex)
+
+  unless subreddit[0] == nil && subreddit[1] == nil
+    text = Mech.new.get_selfpost(subreddit[0][0], subreddit[0][1])
+    event.respond text unless text == ""
+  end
 end
 
 
