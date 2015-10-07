@@ -32,7 +32,8 @@ end
 ######## /schedule
 
 bot.message(:with_text => "/schedule") do |event|
-  event.respond "http://na.lolesports.com/schedule"
+  # event.respond "http://na.lolesports.com/schedule"
+  event.respond "http://worlds.lolesports.com/en_US/worlds"
 end
 
 #########/ champ
@@ -155,6 +156,8 @@ bot.message(:starting_with => "/card") do |event|
   end
 end
 
+
+########## /name
 bot.message(:starting_with => "/name") do |event|
   if event.message.channel.name == "hearthstone_chat"
     name = event.message.text.gsub("/name", "")
@@ -240,6 +243,16 @@ bot.message(:containing => "https://www.reddit.com/r/"  ) do |event|
   unless subreddit[0] == nil && subreddit[1] == nil
     text = Mech.new.get_selfpost(subreddit[0][0], subreddit[0][1])
     event.respond text unless text == ""
+  end
+end
+
+
+###### help
+############# /roles
+bot.message(:starting_with => "/help") do |event|
+  event.respond "help? let me send you a direct message."
+  @help.each do |h|
+    event.message.user.pm(h)
   end
 end
 

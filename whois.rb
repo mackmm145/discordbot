@@ -44,3 +44,22 @@
 @members["gabes_henchman"]     = "Gabe's Henchman - that's me bitches"
 @members["natid4"]             = "Natid4 - League [ Natid4 ] - Nate"
 
+@help = [ "here are the list of available bot commands:",
+          "whois - /whois username returns info on that username /whois all returns all names listed -- example: /whois gabemachida",
+          "schedule - gives you a link to the lolesports.com schedule page",
+          "champ - /champ champname returns info on champion abilities, optionally Q W E R can be appended to specific abilities -- example: /champ vayne q r",
+          "insult - /insult name returns a random insult (your mileage may vary) -- example: /insult goss's_nose",
+          "trivia - /trivia returns random trivia (again, your mileage may vary)",
+          "motivate - /motivate name returns a customized motivational quote to help you -- example: /motivate brandon",
+          "card - /card name returns all matching (and partially matching) hearthstone card images -- example: /card archmage antonidas",
+          "name - /name name returns all partially matching names of cards",
+          "8ball - /8ball question returns a magic eight ball answer -- example: /8ball should i go to work today?",
+          "roles - /roles [name1 name2..name5][role1 role2..role5] randomizes names and roles -- example: /roles [john brandon ray char][adc jungle top mid]",
+          "dice - /dice number returns a random number between 1 to the number -- example: /dice 6",
+          "dice - /dice number1 number2 returns a number between and including the two numbers -- example: /dice 12 20",
+          "dice - /dice [choice1 choice2... choiceX] returns a choice -- example /dice [adc jungle top]",
+          "roll - same as dice",
+          "reddit self - links to reddit self posts will return the first 1000 characters of the self post (to save you that click)",
+          "help - /help... yeah..."
+
+       ]
