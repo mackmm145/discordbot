@@ -45,7 +45,7 @@
 @members["natid4"]             = "Natid4 - League [ Natid4 ] - Nate"
 
 @help = [ "here are the list of available bot commands:",
-          "whois - /whois username returns info on that username /whois all returns all names listed -- example: /whois gabemachida",
+          #"whois - /whois username returns info on that username /whois all returns all names listed -- example: /whois gabemachida",
           "schedule - gives you a link to the lolesports.com schedule page",
           "champ - /champ champname returns info on champion abilities, optionally Q W E R can be appended to specific abilities -- example: /champ vayne q r",
           "insult - /insult name returns a random insult (your mileage may vary) -- example: /insult goss's_nose",

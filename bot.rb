@@ -9,25 +9,25 @@ require_relative 'helpers'
 
 bot = Discordrb::Bot.new "mack@arigatos.net", ENV["HIDDEN_PASSWORD"], true
 
-######## /whois
-bot.message(:starting_with => '/whois') do |event|
-  puts event.message.text
-  name = event.message.text.split(" ")[1]
-  if name.is_a? String
-    name = name.downcase
-    event.respond @members[name]
-  else
-    if event.message.text == '/whoisall'
-      @members.each do |key, member|
-        puts member
-        event.respond member unless key == "gabes_henchman"
-      end
-    else
-      event.respond "type /whois followed by the member's name to get a list of their IGNs"
-      event.respond "there's also a chance that member hasn't been added to the database"
-    end 
-  end
-end
+# ######## /whois
+# bot.message(:starting_with => '/whois') do |event|
+#   puts event.message.text
+#   name = event.message.text.split(" ")[1]
+#   if name.is_a? String
+#     name = name.downcase
+#     event.respond @members[name]
+#   else
+#     if event.message.text == '/whoisall'
+#       @members.each do |key, member|
+#         puts member
+#         event.respond member unless key == "gabes_henchman"
+#       end
+#     else
+#       event.respond "type /whois followed by the member's name to get a list of their IGNs"
+#       event.respond "there's also a chance that member hasn't been added to the database"
+#     end 
+#   end
+# end
 
 ######## /schedule
 
